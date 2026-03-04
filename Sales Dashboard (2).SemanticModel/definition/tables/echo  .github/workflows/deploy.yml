@@ -1,0 +1,25 @@
+
+name: CI_CD_PowerBI
+
+on:
+  push:
+    branches: [ main ] # Le pipeline se déclenche à chaque "Push" sur main
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+
+      - name: Validation du modèle (CI)
+        run: |
+          echo "Analyse des fichiers .SemanticModel..."
+          # Ici on pourrait imaginer un script qui vérifie la qualité du DAX
+
+      - name: Déploiement vers l'environnement (CD)
+        run: |
+          echo "Déploiement du fichier .pbip vers Power BI Service..."
+          # C'est ici que le script change les paramètres de connexion
+          echo "Update Parameter: ServerSource = 'PROD_SQL_SERVER'"
+          
