@@ -1,0 +1,420 @@
+table Data
+	lineageTag: 83041418-eeaf-413d-ae82-2c96429266f7
+
+	measure 'Sales CY' = SUM(Orders[Sales])
+		lineageTag: a4679253-3a20-413f-8962-e21da9d1cee1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Profitt = SUM(Orders[Profit])
+		lineageTag: 302960a5-48da-44e3-88fe-dbac6c06daa5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Margin = DIVIDE([Profitt],[Sales CY],0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 64593c8a-ae5e-4fde-a765-f86dc6509c43
+
+	measure 'Sales LY' =
+			IF(YEAR(MAX('Calendar'[Date]))=2023,
+			    CALCULATE([Sales CY],DATEADD('Calendar'[Date],-1,YEAR)),"NA")
+		lineageTag: 973e0018-540a-45c5-bfc2-ff89bf4f77b2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales YoY %' =
+			
+			var Prev_Year = CALCULATE([Sales YTD],DATEADD('Calendar'[Date],-1,YEAR))
+			return
+			IF(YEAR(MAX('Calendar'[Date]))=2023,
+			DIVIDE([Sales YTD]-Prev_Year,Prev_Year),"NA")
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: c9679ad7-ffbc-490e-a325-02f787035eab
+
+	measure 'Sales per customer' = DIVIDE([Sales CY], [Total Customers])
+		lineageTag: 14917e20-5c16-443a-82c1-f17cca95092f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Customers' = DISTINCTCOUNT(Orders[Customer ID])
+		formatString: 0
+		lineageTag: 02382df2-ef56-4fd3-83ef-95a4adf6dbc0
+
+	measure Title_Footers = "Aubay - Data & Analytics - Employee Insight | Classification : Interne | Dernière mise à jour " & FORMAT(LASTDATE(Data[Order Date]),"dd/mm/yyyy","en-GB")
+		lineageTag: 083b2cd9-df03-4858-9edd-bf640acfe518
+
+	measure 'Orders CY' = COUNT(Orders[Order ID])
+		formatString: 0
+		lineageTag: 774a921c-d733-4719-8291-ff7f260403a4
+
+	measure 'Average rating' = AVERAGE(Orders[rating])
+		formatString: 0
+		lineageTag: 01cb8a56-efa8-4f5e-a747-3af8e5a1ae14
+
+	measure 'Sales YTD' = Calculate(TOTALYTD(SUM(Orders[Sales]),'Calendar'[Date]))
+		lineageTag: 158f7eae-763a-4840-b7d8-6e35b28cd79c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Products = COUNT(Orders[product_id])
+		formatString: 0
+		lineageTag: dab0fc08-fa94-4de9-aa45-fe9b4e8646b4
+
+	measure 'Orders LY' =
+			IF(YEAR(MAX('Calendar'[Date]))=2023,
+			    CALCULATE([Orders CY],DATEADD('Calendar'[Date],-1,YEAR)),"NA")
+		formatString: 0
+		lineageTag: 79775be4-0b4c-424e-b171-b1de54088cb8
+
+	measure Icon_Color_Sales = IF([Sales YoY %]>0,"Green","Red")
+		lineageTag: 0cf5166c-3722-4799-aa56-f459d68848b9
+
+	measure 'Customers Previous Month' = CALCULATE([Current Customers], PREVIOUSMONTH('Calendar'[Date]))
+		formatString: 0
+		lineageTag: 4ce35b0f-a8b0-4d9b-8508-ec0248380a89
+
+	measure 'Churn Rate' = ```
+			
+			   var BeginningCust = [Customers Previous Month]    
+			   var EndingCust = [Current Customers]    
+			   var DiffCust = BeginningCust-EndingCust 
+			return    
+			   IF(DIVIDE(DiffCust,BeginningCust) <> blank (),   DIVIDE(DiffCust,BeginningCust),0)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 1f1170fd-4b9c-4e0d-ac45-27575741b955
+
+	measure ARPU = ```
+			
+			   var DistCountCust = DISTINCTCOUNT(Orders[Customer ID])
+			   var TotalRev = SUM(Orders[Sales])
+			return
+			   DIVIDE(TotalRev,DistCountCust)
+			```
+		lineageTag: ed4c5664-05cb-459a-baab-03cf8f552a73
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ALT = IF(DIVIDE(1,[Churn Rate]), DIVIDE(1,[Churn Rate]), 0)
+		lineageTag: d35272ad-3487-4e3e-a626-59d3bbc110f3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure CLV = [ARPU]*0.1*[ALT]
+		lineageTag: 38badf92-bf88-41ca-805b-73633fd3849e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Average Order Value' = DIVIDE([Sales CY],[Orders CY],0)
+		formatString: 0.00
+		lineageTag: be8cf840-0024-4e2d-a0bd-c172718f8b1e
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 588032c8-7d24-472a-a434-8f13fc3c6fe2
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order ID'
+		dataType: string
+		lineageTag: be245fa1-41d5-4599-8e0f-7df119a62eee
+		summarizeBy: none
+		sourceColumn: Order ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 69ecb377-fa6a-48fe-b91f-5c2f6a5d56d7
+		summarizeBy: none
+		sourceColumn: Order Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Ship Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 55eda97e-b7e5-47c9-89b5-28d6cac98515
+		summarizeBy: none
+		sourceColumn: Ship Date
+
+		variation Variation
+			isDefault
+			relationship: 02270d23-a1ac-4371-b646-f8d1606b4899
+			defaultHierarchy: LocalDateTable_0fa567d5-d697-4b81-b16a-bd3a2e77dd48.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Ship Mode'
+		dataType: string
+		lineageTag: 982ddf56-16a3-47c7-9531-31e4724bb7e1
+		summarizeBy: none
+		sourceColumn: Ship Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: 5afdcc71-d60b-4a9f-b6fa-ac655e592614
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Name'
+		dataType: string
+		lineageTag: 0ab0e727-5633-462e-87f9-d91d76084438
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 9d21e48f-6bc4-4b80-bb21-3e303a90880a
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 0ac6e41c-4de3-4b82-8c2f-761c567dca78
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 04e45ab6-8bed-4110-8caa-2a0ff9467db4
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: fd993943-359e-4af7-af78-1f0f29610a0c
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 0f6fdee7-6b37-4c71-aecc-5c4f7d457761
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product ID'
+		dataType: string
+		lineageTag: 800f0275-c194-4402-9295-6e900497c2b4
+		summarizeBy: none
+		sourceColumn: Product ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 0766aabd-b671-46be-96c3-be0fc1b294ed
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-Category
+		dataType: string
+		lineageTag: 54ca8a04-1a8a-4e0d-8638-d96f21022c76
+		summarizeBy: none
+		sourceColumn: Sub-Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: 892649ab-ad8a-4c8d-b3e7-87e10e4e3b6a
+		summarizeBy: none
+		sourceColumn: Product Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales
+		dataType: double
+		lineageTag: ab1c6229-ecfd-4a6a-899e-a5948f66a3c8
+		summarizeBy: sum
+		sourceColumn: Sales
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: f9c242b7-1b9b-4f8c-9b99-d0cae75ec3b8
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Profit
+		dataType: double
+		lineageTag: 2e9c503d-0387-4fad-bf98-a45c2a7b5c5a
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Returns
+		dataType: string
+		lineageTag: 18687485-6d2b-4124-bb33-7427aa0ef95f
+		summarizeBy: none
+		sourceColumn: Returns
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Payment Mode'
+		dataType: string
+		lineageTag: e8668219-7786-48b4-bde1-c73e8ae1503d
+		summarizeBy: none
+		sourceColumn: Payment Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month = MONTH(Data[Order Date])
+		formatString: 0
+		lineageTag: ac302b6d-8e19-43d5-997a-487a68f37d34
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column rating
+		dataType: double
+		lineageTag: d681c666-a163-45c3-9941-4a8fd0d5e28c
+		summarizeBy: sum
+		sourceColumn: rating
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column rating_count
+		dataType: double
+		lineageTag: 01763609-323d-4e71-bd0b-919d60cea1b7
+		summarizeBy: sum
+		sourceColumn: rating_count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column product_id
+		dataType: string
+		lineageTag: 07f8630a-2ada-46bf-9537-40d2ad0da9ba
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: 8aeb1926-4efa-4b82-b2ca-509a4473daa9
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column img_link
+		dataType: string
+		lineageTag: d2a03399-f0a2-4614-923d-bac02a50bcb2
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: img_link
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_link
+		dataType: string
+		lineageTag: 5bef6e28-2702-47c0-a567-0454d6c12c07
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: product_link
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.1'
+		dataType: string
+		lineageTag: 3da41332-10de-457d-bb89-cff4bb0e255f
+		summarizeBy: none
+		sourceColumn: category.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.2'
+		dataType: string
+		lineageTag: ca1ad762-661c-4944-b63f-1d2e56bea5f1
+		summarizeBy: none
+		sourceColumn: category.2
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.3'
+		dataType: string
+		lineageTag: 632398fd-e8c9-4cd6-9463-db961e2cbeaa
+		summarizeBy: none
+		sourceColumn: category.3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.4'
+		dataType: string
+		lineageTag: bf6ce7d6-8138-43ac-b1c2-cac93483d774
+		summarizeBy: none
+		sourceColumn: category.4
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.5'
+		dataType: string
+		lineageTag: 82202423-93c7-415f-88a0-76bf549b6f83
+		summarizeBy: none
+		sourceColumn: category.5
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Data = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\onouiri\Desktop\Nouveau dossier\Sales dataset\SuperStore Sales DataSet image.xlsx"), null, true),
+				    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Row ID+O6G3A1:R6", Int64.Type}, {"Order ID", type text}, {"Order Date", type date}, {"Ship Date", type date}, {"Ship Mode", type text}, {"Customer ID", type text}, {"Customer Name", type text}, {"Segment", type text}, {"Country", type text}, {"City", type text}, {"State", type text}, {"Region", type text}, {"Product ID", type text}, {"Category", type text}, {"Sub-Category", type text}, {"Product Name", type text}, {"Sales", type number}, {"Quantity", Int64.Type}, {"Profit", type number}, {"Returns", type any}, {"Payment Mode", type text}, {"ind1", type any}, {"ind2", type any}}),
+				    #"Replaced Errors" = Table.ReplaceErrorValues(#"Changed Type", {{"Returns", 0}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Replaced Errors",{"ind1", "ind2"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns",{{"rating_count", type number}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"Row ID+O6G3A1:R6", "ID"}}),
+				    #"Split Column by Delimiter" = Table.SplitColumn(#"Renamed Columns", "category", Splitter.SplitTextByDelimiter("|", QuoteStyle.None), {"category.1", "category.2", "category.3", "category.4", "category.5"}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"category.1", type text}, {"category.2", type text}, {"category.3", type text}, {"category.4", type text}, {"category.5", type text}})
+				in
+				    #"Changed Type2"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

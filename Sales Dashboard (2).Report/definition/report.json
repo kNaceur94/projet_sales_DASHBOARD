@@ -1,0 +1,104 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.1.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY23SU08",
+      "reportVersionAtImport": {
+        "visual": "1.8.84",
+        "report": "2.0.84",
+        "page": "1.3.84"
+      },
+      "type": "SharedResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "PBI_CV_9053509D_D461_463A_B485_CE9F6AB0F13D",
+    "ratingsvisual001",
+    "simpleImageEBC4593F96F1425FB3D84C5BF02B5075"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY23SU08",
+          "path": "BaseThemes/CY23SU08.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "500_F_16362823_JyBzUKqSQHzfT5c9406414905299816.jpg",
+          "path": "500_F_16362823_JyBzUKqSQHzfT5c9406414905299816.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "clear-filter20620221224338953.png",
+          "path": "clear-filter20620221224338953.png",
+          "type": "Image"
+        },
+        {
+          "name": "growth1132833412285843.png",
+          "path": "growth1132833412285843.png",
+          "type": "Image"
+        },
+        {
+          "name": "interest-rate39012462253517266.png",
+          "path": "interest-rate39012462253517266.png",
+          "type": "Image"
+        },
+        {
+          "name": "investment1855672864945357.png",
+          "path": "investment1855672864945357.png",
+          "type": "Image"
+        },
+        {
+          "name": "money-bag17997151361144192.png",
+          "path": "money-bag17997151361144192.png",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": false,
+    "useDefaultAggregateDisplayName": true
+  }
+}

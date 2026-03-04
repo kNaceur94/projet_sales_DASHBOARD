@@ -1,0 +1,51 @@
+table Region
+	lineageTag: edd07e48-39ab-4288-a711-b0e25cd88acc
+
+	column Country
+		dataType: string
+		lineageTag: cd3a7027-70f1-41ae-8147-35261754ea81
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: db2d8c9a-5a04-466c-b3af-95f69ddecdaf
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: e850f837-6172-4d9a-93e6-5690d8e764b9
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: dc9103d6-17e9-420a-b2f5-6cb47fef85c3
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Region = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\onouiri\Desktop\Nouveau dossier\Source.xlsx"), null, true),
+				    Region_Sheet = Source{[Item="Region",Kind="Sheet"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(Region_Sheet,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}}),
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Changed Type", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"Country", type text}, {"Region", type text}, {"State", type text}, {"City", type text}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

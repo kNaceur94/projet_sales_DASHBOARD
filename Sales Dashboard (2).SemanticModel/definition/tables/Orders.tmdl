@@ -1,0 +1,293 @@
+table Orders
+	lineageTag: 30ddcd4f-6346-468c-b283-b6e136f172f1
+
+	measure Trend = ```
+			
+			    VAR Down = UNICHAR(11167)
+			    VAR Up = UNICHAR(11165)
+			    VAR Side = UNICHAR(11166)
+			    RETURN
+			       IF([Sales YoY %] < 0, Down, IF([Sales YoY %] >= 0.1, Up,Side))
+			```
+		lineageTag: 3ce95028-cba6-461e-a51e-177396f22902
+
+	measure Sales_Icon_Color = IF([Sales YoY %]>0,"Green","Red")
+		lineageTag: 78f930da-beaf-4762-be10-cd024de2bec4
+
+	measure 'New Customers' = ```
+			
+			VAR currentCustomers = VALUES(Orders[Customer ID])
+			VAR currentDate = MIN('Calendar'[Date])
+			VAR pastCustomers = CALCULATETABLE(VALUES(Orders[Customer ID]),ALL('Calendar'[Date]),'Calendar'[Date]<currentDate)
+			VAR newCustomers = EXCEPT(currentCustomers,pastCustomers)
+			RETURN 
+			COUNTROWS(newCustomers)
+			```
+		formatString: 0
+		lineageTag: bc6c616e-a833-4c77-a1d7-c68dfbefa796
+
+	measure 'New Customer Revenue' = ```
+			
+			VAR currentCustomers = VALUES(Orders[Customer ID])
+			VAR currentDate = MIN('Calendar'[Date])
+			VAR pastCustomers = CALCULATETABLE(VALUES(Orders[Customer ID]),ALL('Calendar'[Date]),'Calendar'[Date]<currentDate)
+			VAR newCustomers = EXCEPT(currentCustomers,pastCustomers)
+			RETURN 
+			SUMX(newCustomers, CALCULATE(sum(Orders[Sales])))
+			```
+		lineageTag: 3d2590c1-9a04-4835-b884-0acf68db8fad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Repeat Customers from Previou Month' = ```
+			
+			VAR currentCustomers = VALUES(Orders[Customer ID])
+			VAR previousMonthDates = PREVIOUSMONTH('Calendar'[Date])
+			VAR previousMonthCustomers = CALCULATETABLE(VALUES(Orders[Customer ID]),ALL('Calendar'[Date]), previousMonthDates)
+			VAR repeatCustomersPreviousMonth = INTERSECT(currentCustomers, previousMonthCustomers)
+			RETURN 
+			COUNTROWS(repeatCustomersPreviousMonth)
+			```
+		formatString: 0
+		lineageTag: d85ae822-c527-40f7-a769-e4ae5948a16b
+
+	measure 'Repeat Customer Revenue from Previous Month' = ```
+			
+			VAR currentCustomers = VALUES(Orders[Customer ID])
+			VAR previousMonthDates = PREVIOUSMONTH('Calendar'[Date])
+			VAR previousMonthCustomers = CALCULATETABLE(VALUES(Orders[Customer ID]),ALL('Calendar'[Date]), previousMonthDates)
+			VAR repeatCustomersPreviousMonth = INTERSECT(currentCustomers, previousMonthCustomers)
+			RETURN 
+			SUMX(repeatCustomersPreviousMonth, CALCULATE(sum(Orders[Sales])))
+			```
+		lineageTag: 4fc85de3-9d0f-4746-8443-43498fed4897
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Repeat Customers' = ```
+			
+			VAR CurrentDate = MIN('Calendar'[Date])
+			VAR CurrentCustomers = VALUES(Orders[Customer ID])
+			VAR PastCustomers = CALCULATETABLE(VALUES(Orders[Customer ID]),ALL('Calendar'[Month],'Calendar'[MonthNum],'Calendar'[Year]),'Calendar'[Date] < CurrentDate)
+			VAR RepeatCustomers = INTERSECT(CurrentCustomers,PastCustomers)
+			RETURN 
+			COUNTROWS(RepeatCustomers)
+			```
+		formatString: 0
+		lineageTag: 2046d51c-ed05-4a26-95aa-cc33956b60d5
+
+	measure 'Repeat Customer Revenue' =
+			
+			VAR CurrentDate = MIN('Calendar'[Date])
+			VAR CurrentCustomers = VALUES(Orders[Customer ID])
+			VAR PastCustomers = CALCULATETABLE(VALUES(Orders[Customer ID]),ALL('Calendar'[Month],'Calendar'[MonthNum],'Calendar'[Year]),'Calendar'[Date] < CurrentDate)
+			RETURN
+			SUMX(PastCustomers, CALCULATE(sum(Orders[Sales])))
+		lineageTag: f18dd222-3499-4946-bf00-cba90b78343e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Current Customers' = DISTINCTCOUNT(Orders[Customer ID])
+		formatString: 0
+		lineageTag: 9b35755d-b72d-4e14-a075-f8f4e201de91
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: a05aadad-9cde-40f3-a65f-5bc8a8efbb9a
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order ID'
+		dataType: string
+		lineageTag: 7982ac1e-1911-4343-8e74-75bd5e4be37d
+		summarizeBy: none
+		sourceColumn: Order ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Date 2019'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fca2daa2-c110-4e9e-973a-835438e8004b
+		summarizeBy: none
+		sourceColumn: Order Date 2019
+
+		variation Variation
+			isDefault
+			relationship: fe6ff8da-7ed3-41ad-a8c1-25d1f9528640
+			defaultHierarchy: LocalDateTable_7896416f-73c0-48aa-b199-5126f72df277.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ship Date 2019'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6143fcf1-d4b6-4b13-801e-f8727a1cd3ec
+		summarizeBy: none
+		sourceColumn: Ship Date 2019
+
+		variation Variation
+			isDefault
+			relationship: ad74a5f4-507a-4a6f-8d07-5d7053144d61
+			defaultHierarchy: LocalDateTable_afc53e4c-2c51-4bf2-aede-d08fc9aa63c3.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: d6787dcf-4cb5-4747-955c-f04a06a5a915
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 044768a3-5398-4f68-90d0-cecd607dd46d
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: string
+		lineageTag: 0aa7f7e3-ceff-4eef-a134-fcb8bc4f778b
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ship Mode'
+		dataType: string
+		lineageTag: 83438aae-5ed4-471c-8c1a-fcf8b8bf3bf9
+		summarizeBy: none
+		sourceColumn: Ship Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 68055f0a-46ac-413d-a8e1-b903f1a262dd
+		summarizeBy: sum
+		sourceColumn: Sales
+
+		annotation SummarizationSetBy = Automatic
+
+	column Profit
+		dataType: double
+		lineageTag: f9a7c84c-6a35-4088-b5ab-97cfcc8cfe5b
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Returns
+		dataType: int64
+		formatString: 0
+		lineageTag: ec411477-50be-40bf-b8c8-49cd138e4a82
+		summarizeBy: sum
+		sourceColumn: Returns
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: dbd36ebb-1ce3-42b0-8923-e4ac3f2697c7
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column rating_count
+		dataType: double
+		lineageTag: 7f09f32c-10e7-4bde-9560-570f461c3f29
+		summarizeBy: sum
+		sourceColumn: rating_count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column rating
+		dataType: double
+		lineageTag: 3955abdd-3880-4a11-85f6-442c8501cfc3
+		summarizeBy: sum
+		sourceColumn: rating
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Payment Mode'
+		dataType: string
+		lineageTag: fcb75b51-d1aa-4828-8fdd-1984ac097a33
+		summarizeBy: none
+		sourceColumn: Payment Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Delivery = DATEDIFF(Orders[Order Date 2019],Orders[Ship Date 2019],DAY)
+		formatString: 0
+		lineageTag: 2e836c2c-8f16-42e7-a43d-970d3460df42
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Order date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 185e8979-b07e-45b3-b3c4-7a8ad0741059
+		summarizeBy: none
+		sourceColumn: Order date
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Ship date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: b029a5a0-d8a8-4aea-b840-42dd0ac3f785
+		summarizeBy: none
+		sourceColumn: Ship date
+
+		variation Variation
+			isDefault
+			relationship: dcab903e-a81e-4c58-ab78-8a08d1101799
+			defaultHierarchy: LocalDateTable_2c7b5c76-bff8-4d15-80ff-4d324b896a07.'Date Hierarchy'
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Orders = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\onouiri\Desktop\Nouveau dossier\Source.xlsx"), null, true),
+				    Orders_Sheet = Source{[Item="Orders",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Orders_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ID", Int64.Type}, {"Order ID", type text}, {"Order Date", type datetime}, {"Ship Date", type datetime}, {"Customer ID", type text}, {"City", type text}, {"product_id", type text}, {"Ship Mode", type text}, {"Sales", type number}, {"Profit", type number}, {"Returns", Int64.Type}, {"Quantity", Int64.Type}, {"rating_count", type number}, {"rating", type number}, {"Payment Mode", type text}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "Order date 2023", each Date.AddYears([Order Date],3)),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Ship date 2023", each Date.AddYears([Ship Date],3)),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Custom1",{{"Order Date", "Order Date 2019"}, {"Ship Date", "Ship Date 2019"}, {"Order date 2023", "Order date"}, {"Ship date 2023", "Ship date"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

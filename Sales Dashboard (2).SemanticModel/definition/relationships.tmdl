@@ -1,0 +1,45 @@
+relationship 02270d23-a1ac-4371-b646-f8d1606b4899
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Data.'Ship Date'
+	toColumn: LocalDateTable_0fa567d5-d697-4b81-b16a-bd3a2e77dd48.Date
+
+relationship ad74a5f4-507a-4a6f-8d07-5d7053144d61
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Orders.'Ship Date 2019'
+	toColumn: LocalDateTable_afc53e4c-2c51-4bf2-aede-d08fc9aa63c3.Date
+
+relationship 23cd0331-4f3d-4c2c-b28e-bc4626ceea42
+	fromColumn: Orders.'Customer ID'
+	toColumn: Customers.'Customer ID'
+
+relationship f8019495-b23a-45b8-8b77-a1f9f0154374
+	fromColumn: Orders.City
+	toColumn: Region.City
+
+relationship 02c37ad6-c05d-446d-b653-ad887dee5290
+	fromColumn: Orders.product_id
+	toColumn: Products.product_id
+
+relationship fe6ff8da-7ed3-41ad-a8c1-25d1f9528640
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Orders.'Order Date 2019'
+	toColumn: LocalDateTable_7896416f-73c0-48aa-b199-5126f72df277.Date
+
+relationship 7331b0bc-e53a-482c-a91d-9c610afe4ac6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Calendar.Date
+	toColumn: LocalDateTable_81ef9100-fdfa-40ab-9eb0-3747a27aac2f.Date
+
+relationship bfae6c32-f9d0-4303-a66a-9697ada1a1b0
+	fromColumn: Data.'Order Date'
+	toColumn: Calendar.Date
+
+relationship 15bb6876-d705-4c74-8406-1cca35d8b676
+	fromColumn: Orders.'Order date'
+	toColumn: Calendar.Date
+
+relationship dcab903e-a81e-4c58-ab78-8a08d1101799
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Orders.'Ship date'
+	toColumn: LocalDateTable_2c7b5c76-bff8-4d15-80ff-4d324b896a07.Date
+

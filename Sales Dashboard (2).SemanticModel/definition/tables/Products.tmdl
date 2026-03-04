@@ -1,0 +1,92 @@
+table Products
+	lineageTag: b0e9c51c-cbdb-4db1-8d4a-d7d270b5a130
+
+	column product_id
+		dataType: string
+		lineageTag: e44522f7-556f-4633-855a-5a9f38eac3bf
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: 58c6030e-4cdb-447a-bd1c-1fb1490280cb
+		summarizeBy: none
+		sourceColumn: Product Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.1'
+		dataType: string
+		lineageTag: ec718513-8d57-44c8-81ee-d21dc2133716
+		summarizeBy: none
+		sourceColumn: category.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.2'
+		dataType: string
+		lineageTag: f2372d8c-6e5e-4f4c-8a60-0d0d96bb7d09
+		summarizeBy: none
+		sourceColumn: category.2
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.3'
+		dataType: string
+		lineageTag: 37b341ee-4e64-411c-9f21-2dde852a3dd5
+		summarizeBy: none
+		sourceColumn: category.3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.4'
+		dataType: string
+		lineageTag: cd7d55be-63c9-444c-be4d-571b25e1551b
+		summarizeBy: none
+		sourceColumn: category.4
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'category.5'
+		dataType: string
+		lineageTag: 5bf4cebb-be35-44b8-975f-c329486b0083
+		summarizeBy: none
+		sourceColumn: category.5
+
+		annotation SummarizationSetBy = Automatic
+
+	column img_link
+		dataType: string
+		lineageTag: d39bad23-7fe4-4eea-a48e-2d27b4d29ba8
+		summarizeBy: none
+		sourceColumn: img_link
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_link
+		dataType: string
+		lineageTag: a3770c90-99e9-4bdd-bd4b-bbe1e55a5014
+		summarizeBy: none
+		sourceColumn: product_link
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Products = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\onouiri\Desktop\Nouveau dossier\Source.xlsx"), null, true),
+				    Products_Sheet = Source{[Item="Products",Kind="Sheet"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(Products_Sheet,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}, {"Column6", type text}, {"Column7", type text}, {"Column8", type text}, {"Column9", type text}}),
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Changed Type", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"product_id", type text}, {"product_name", type text}, {"category.1", type text}, {"category.2", type text}, {"category.3", type text}, {"category.4", type text}, {"category.5", type text}, {"img_link", type text}, {"product_link", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"product_name", "Product Name"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
